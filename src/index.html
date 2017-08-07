@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>
+        <%= compilation.assets[htmlWebpackPlugin.files.chunks.manifest.entry.substr(
+            htmlWebpackPlugin.files.publicPath.length)].source() %>
+    </script>
+    <% for (var k in htmlWebpackPlugin.files.chunks) { %>
+        <% if (k !== 'manifest') { %>
+            <script src="<%= htmlWebpackPlugin.files.chunks[k].entry %>"></script>
+        <% } %>
+    <% } %>
+</head>
+
+<body>
+    <div ng-controller="mathController">
+        <b>{{a}} + {{b}} = {{c}}</b>
+    </div>
+    <%= new Date()%>
+</body>
+
+</html>
