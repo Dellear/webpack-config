@@ -23,14 +23,14 @@ module.exports = merge(baseWebpackConfig, {
     // },
     devtool: '#cheap-module-source-map',
     plugins: [
-        new HtmlWebpackPlugin({
-            template: './src/index.html',
-            filename: 'index.html',
-            inject: false
-        }),
-        new webpack.DefinePlugin({
-            'process.env': config.dev.env
-        }),
+        // new HtmlWebpackPlugin({
+        //     template: './src/index.html',
+        //     filename: 'index.html',
+        //     inject: false
+        // }),
+        // new webpack.DefinePlugin({
+        //     'process.env': config.dev.env
+        // }),
         // split vendor js into its own file
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
@@ -40,7 +40,7 @@ module.exports = merge(baseWebpackConfig, {
                     module.resource &&
                     /\.js$/.test(module.resource) &&
                     module.resource.indexOf(
-                        path.join(__dirname, '../node_modules')
+                        path.resolve(__dirname, '../node_modules')
                     ) === 0
                 )
             }
@@ -51,12 +51,12 @@ module.exports = merge(baseWebpackConfig, {
             name: 'manifest',
             chunks: ['vendor']
         }),
-        new CopyWebpackPlugin([
-            { from: './src/data.json' }
-        ]),
+        // new CopyWebpackPlugin([
+        //     { from: './src/data.json' }
+        // ]),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin(),
         new FriendlyErrorsWebpackPlugin()
-    ]
+    ].concat(baseWebpackConfig.plugins)
 });
 

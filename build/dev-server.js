@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'development';
+
 var webpack = require('webpack');
 var config = require('../config');
 var devWebpackConfig = require('../config/webpack.dev.conf');
@@ -12,7 +14,11 @@ var devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: devWebpackConfig.output.publicPath,
   quiet: false,
   stats: {
-    colors: true
+    colors: true,
+    modules: false,
+    children: false,
+    chunks: false,
+    chunkModules: false
   }
 });
 

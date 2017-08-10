@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'production';
+
 var config = require('../config');
 var rm = require('rimraf');
 var path = require('path');
@@ -9,7 +11,7 @@ var ora = require('ora');
 var spinner = ora('building for production...');
 spinner.start();
 
-rm(path.join(config.build.assetsRoot, config.build.assetsSubDriectory), err => {
+rm(path.posix.join(config.build.assetsRoot, config.build.assetsSubDriectory), err => {
     if (err) throw err;
     webpack(webpackConfig, function(err, stats) {
         spinner.stop();

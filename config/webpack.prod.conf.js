@@ -10,7 +10,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = merge(baseWebpackConfig, {
     output: {
         path: config.build.assetsRoot,
-        filename: path.join(config.build.assetsSubDriectory, 'js/[name]-[chunkhash:8].min.js')
+        filename: path.posix.join(config.build.assetsSubDriectory, 'js/[name]-[chunkhash:8].min.js')
     },
     devtool: config.build.productionSourceMap ? '#source-map' : false,
     plugins: [
@@ -44,7 +44,7 @@ module.exports = merge(baseWebpackConfig, {
                     module.resource &&
                     /\.js$/.test(module.resource) &&
                     module.resource.indexOf(
-                        path.join(__dirname, '../node_modules')
+                        path.resolve(__dirname, '../node_modules')
                     ) === 0
                 )
             }
@@ -55,9 +55,9 @@ module.exports = merge(baseWebpackConfig, {
             name: 'manifest',
             chunks: ['vendor']
         }),
-        new CopyWebpackPlugin([
-            { from: './src/data.json' }
-        ]),
-    ]
+        // new CopyWebpackPlugin([
+        //     { from: './src/data.json' }
+        // ]),
+    ].concat(baseWebpackConfig.plugins)
 });
 

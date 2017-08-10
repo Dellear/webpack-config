@@ -10,10 +10,13 @@
         <%= compilation.assets[htmlWebpackPlugin.files.chunks.manifest.entry.substr(
             htmlWebpackPlugin.files.publicPath.length)].source() %>
     </script>
-    <% for (var k in htmlWebpackPlugin.files.chunks) { %>
+    <% for (let k in htmlWebpackPlugin.files.chunks) { %>
         <% if (k !== 'manifest') { %>
             <script src="<%= htmlWebpackPlugin.files.chunks[k].entry %>"></script>
         <% } %>
+    <% } %>
+    <% for (let i=0; i< htmlWebpackPlugin.files.css.length; i++) { %>
+        <link type="text/css" rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[i] %>">
     <% } %>
 </head>
 
@@ -22,6 +25,9 @@
         <b>{{a}} + {{b}} = {{c}}</b>
     </div>
     <%= new Date()%>
+
+    <div class="img1"></div>
+    <div class="img2"></div>
 </body>
 
 </html>
