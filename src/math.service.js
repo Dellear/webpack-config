@@ -1,5 +1,5 @@
-export default class mathService {
-    /**@ngInject */
+/**@ngInject */
+export default class MathService {
     constructor($http) {
         this.$http = $http;
     }

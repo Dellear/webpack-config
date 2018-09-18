@@ -1,10 +1,7 @@
-import mathService from './math.service';
 
-export default class mathController extends mathService {
-
-    /**@ngInject */
+/**@ngInject */
+export default class MathController {
     constructor($scope, mathService) {
-        super();
         this.$scope = $scope;
         this.mathService = mathService;
         this.init();
@@ -18,5 +15,3 @@ export default class mathController extends mathService {
         });
     }
 }
-
-// export default mathController;
