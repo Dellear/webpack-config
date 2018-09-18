@@ -13,5 +13,3 @@ export default class mathService {
         return this.$http.get('./data.json');
     }
 }
-
-// export default mathService;

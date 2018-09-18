@@ -1,62 +1,33 @@
-var path = require('path');
-var webpack =require('webpack');
-var config = require('./index');
-var merge = require('webpack-merge');
-var baseWebpackConfig = require('./webpack.base.conf');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+process.env.NODE_ENV = JSON.stringify('development');
 
-// process.env.NODE_ENV = 'production';
+const merge = require('webpack-merge');
+const path = require('path');
+const webpackBase = require('./webpack.base.conf');
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+const chrome = process.platform === 'win32' ? 'chrome' : 'google-chrome';
 
-// add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function (name) {
-    baseWebpackConfig.entry[name] = [path.resolve(__dirname, './dev-client.js')].concat(baseWebpackConfig.entry[name])
-})
+module.exports = merge(webpackBase, {
+  output: {
+    path: path.resolve(__dirname, '../dist'),
+    filename: '[name].js',
+  },
+  watch: true,
+  devtool: '#cheap-module-source-map',
+  plugins: [
+    // 使用browser-sync实时刷新页面
+    new BrowserSyncPlugin({
+      server: {
+        baseDir: './',
+        https: false,
+        // middleware: Proxy
+      },
+      open: 'local',
+      ghostMode: false,
+      browser: chrome,
+      startPath: 'dist/index.html',
+      notify: false,
 
-module.exports = merge(baseWebpackConfig, {
-    // entry: {
-    //     app: [
-    //         path.resolve(__dirname, './dev-client.js'),
-    //         path.resolve(__dirname, '../src/index.js')
-    //     ]
-    // },
-    devtool: '#cheap-module-source-map',
-    plugins: [
-        // new HtmlWebpackPlugin({
-        //     template: './src/index.html',
-        //     filename: 'index.html',
-        //     inject: false
-        // }),
-        // new webpack.DefinePlugin({
-        //     'process.env': config.dev.env
-        // }),
-        // split vendor js into its own file
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor',
-            minChunks: function (module, count) {
-                // any required modules inside node_modules are extracted to vendor
-                return (
-                    module.resource &&
-                    /\.js$/.test(module.resource) &&
-                    module.resource.indexOf(
-                        path.resolve(__dirname, '../node_modules')
-                    ) === 0
-                )
-            }
-        }),
-        // extract webpack runtime and module manifest to its own file in order to
-        // prevent vendor hash from being updated whenever app bundle is updated
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'manifest',
-            chunks: ['vendor']
-        }),
-        // new CopyWebpackPlugin([
-        //     { from: './src/data.json' }
-        // ]),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoEmitOnErrorsPlugin(),
-        new FriendlyErrorsWebpackPlugin()
-    ].concat(baseWebpackConfig.plugins)
+    }),
+
+  ],
 });
-

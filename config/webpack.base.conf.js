@@ -1,99 +1,112 @@
-var path = require('path');
-var config = require('./index');
-var webpack = require('webpack');
-var cssLoders = require('./cssloaders.config');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
+const cssLoders = require('./cssloaders.conf');
 
-var isProduction = process.env.NODE_ENV === 'production' ? true : false;
+const LIMITURL = 20000;
+const isProduction =  function () {
+  return process.env.NODE_ENV === JSON.stringify('production');
+};
 
 module.exports = {
-    entry: {
-        app: path.resolve(__dirname, '../src/index.js')
-    },
-    output: {
-        path: config.build.assetsRoot,
-        filename: path.posix.join(config.build.assetsSubDriectory, 'js/[name].js'),
-        publicPath: process.env.NODE_ENV === 'production'
-            ? config.build.assetsPublicPath
-            : config.dev.assetsPublicPath
-    },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /(node_modules|bower_components)/,
-                use: ['ng-annotate-loader', 'babel-loader']
-            },
-            {
-                test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: [
-                        cssLoders.css,
-                        cssLoders.postCss,
-                    ]
-                })
-            },
-            {
-                test: /\.less$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: [
-                        cssLoders.css,
-                        cssLoders.postCss,
-                        cssLoders.less
-                    ]
-                })
-            },
-            {
-                test: /\.(png|gif|jpe?g|svg)$/,
-                use: [
-                    {
-                        loader: 'url-loader',
-                        options: {
-                            limit: 8192,
-                            name: path.posix.join(config.build.assetsSubDriectory, 'images/[name].[ext]')
-                        }
-                    },
-                    {
-                        loader: 'img-loader',
-                        options: {
-                            enabled: isProduction,
-                            gifsicle: { interlaced: false },
-                            mozjpeg: { progressive: true, arithmetic: false },
-                            optipng: false, // disabled
-                            pngquant: { floyd: 0.5, speed: 2 },
-                            svgo: { plugins: [{ removeTitle: true }, { convertPathData: false }]}
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    plugins: [
-        new ExtractTextPlugin(isProduction
-                ? path.posix.join(config.build.assetsSubDriectory, 'css/[name]-[chunkhash:8].min.css')
-                : path.posix.join(config.build.assetsSubDriectory, 'css/[name].css')),
-        new HtmlWebpackPlugin({
-            template: './src/index.html',
-            filename: 'index.html',
-            inject: false,
-            minify: isProduction
-                    ? {
-                        removeComments: true,
-                        collapseWhitespace: true,
-                        removeAttributeQuotes: true
-                    } : false,
-            // chunksSortMode: 'dependency'
-        }),
-        new webpack.DefinePlugin({
-            'process.env': process.env.NODE_ENV
-        }),
-        new CopyWebpackPlugin([
-            { from: './src/data.json' }
-        ])
-    ]
+  entry: {
+    'index': './src/index.js',
+  },
 
+  stats: {
+    colors: true,
+    modules: false,
+    children: false,
+    chunks: false,
+    chunkModules: false,
+  },
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /(node_modules|bower_components)/,
+      use: isProduction()
+        ? ['ng-annotate-loader', 'babel-loader']
+        : ['ng-annotate-loader', 'babel-loader', 'eslint-loader'],
+    },
+    {
+      test: /\.html$/,
+      use: ['html-loader'],
+    },
+    {
+      test: /\.css$/,
+      use: ExtractTextPlugin.extract({
+        fallback: 'style-loader',
+        use: [
+          cssLoders.css,
+          cssLoders.postCss,
+        ],
+      }),
+    },
+    {
+      test: /\.less$/,
+      use: ExtractTextPlugin.extract({
+        fallback: 'style-loader',
+        use: [
+          cssLoders.css,
+          cssLoders.postCss,
+          cssLoders.less
+        ],
+      }),
+    },
+
+    {
+      test: /\.(png|jpg|gif)$/,
+      use: [
+        {
+          loader: 'url-loader',
+          options: {
+            limit: LIMITURL,
+            name: 'assets/images/[name]-[hash:8].[ext]',
+          },
+        },
+      ],
+    },
+    {
+      test: /\.(woff|woff2|ttf|svg|eot)$/,
+      use: [
+        {
+          loader: 'url-loader',
+          options: {
+            limit: LIMITURL,
+            name: 'assets/fonts/[name]-[hash:8].[ext]',
+          },
+        },
+      ],
+    },
+    {
+      test: /\.(mp4|ogg)$/,
+      loader: 'file-loader',
+    },
+    ],
+  },
+  plugins: [
+    //单独生成html文件
+    new HtmlWebpackPlugin({
+      template: './src/index.ejs',
+      filename: 'index.html',
+      minify: isProduction()
+              ? {
+                  removeComments: true,
+                  collapseWhitespace: true,
+                  removeAttributeQuotes: true
+              } : false,
+    }),
+
+    new CopyWebpackPlugin([
+      { from: './src/data.json' }
+  ]),
+
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': process.env.NODE_ENV,
+    }),
+
+    new ExtractTextPlugin(isProduction() ? '[name]-[hash].min.css' : '[name].css'),
+
+  ],
 }
